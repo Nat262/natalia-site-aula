@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receitas Rápidas</title>
+
+    <!-- Meu JS -->
+    <script src="js/script.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: rgb(255, 202, 243);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .recipe-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .recipe-card {
+            background: #ffffff;
+            border: 1px solid #e317b7;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 15px;
+            width: calc(30% - 40px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .recipe-card h3 {
+            font-size: 20px;
+            margin: 0 0 10px;
+        }
+
+        .recipe-card p {
+            margin: 0 0 15px;
+        }
+
+        .favorite-button, .view-more-button, .view-favorites-button, .back-button {
+            background-color: #ff55b2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-top: 10px;
+        }
+
+        .favorite-button:hover, .view-more-button:hover, .view-favorites-button:hover, .back-button:hover {
+            background-color: #ff1a91;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-button {
+            background-color: #ff55b2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .close-button:hover {
+            background-color: #ff1a91;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>Receitas Rápidas</h1>
+
+        <div class="recipe-list" id="recipe-list">
+            <!-- As receitas serão geradas aqui pelo JavaScript -->
+        </div>
+
+        <button class="view-favorites-button" onclick="displayFavorites()">Visualizar Favoritos</button>
+        <button class="back-button" onclick="goToLoginPage()">Voltar à Página de Login</button>
+    </div>
+
+    <!-- Modal para exibir favoritos -->
+    <div id="favoritesModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeFavorites()">Fechar</button>
+            <h2>Receitas Favoritas</h2>
+            <div id="favorites-list">
+                <!-- Favoritos serão exibidos aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados das receitas
+        const recipes = [
+        {
+                id: 1,
+                title: "Espaguete ao Molho de Tomate",
+                description: "Um clássico italiano feito com molho de tomate fresco e manjericão.",
+                fullDescription: "Essa receita de espaguete ao molho de tomate é rápida e deliciosa! Você precisará de: tomates maduros, alho, manjericão fresco, azeite de oliva e espaguete. Cozinhe o espaguete até ficar al dente, prepare o molho com os ingredientes frescos e misture tudo. Pronto para servir!"
+            },
+            {
+                id: 2,
+                title: "Frango Grelhado com Ervas",
+                description: "Peito de frango temperado com ervas aromáticas e grelhado até ficar suculento.",
+                fullDescription: "Essa receita de frango grelhado é simples e saudável! Tempere o peito de frango com sal, pimenta, tomilho e alecrim. Deixe marinar por 30 minutos, depois grelhe até dourar. Sirva com legumes assados ou uma salada fresca."
+            },
+            {
+                id: 3,
+                title: "Salada de Quinoa e Legumes",
+                description: "Uma salada leve e nutritiva com quinoa, legumes frescos e molho de limão.",
+                fullDescription: "Para essa salada, cozinhe a quinoa conforme as instruções da embalagem. Misture com legumes frescos, como pepino, tomate, e cenoura, e adicione um molho de limão com azeite. É uma refeição leve e cheia de sabor!"
+            },
+            {
+                id: 4,
+                title: "Panquecas de Banana",
+                description: "Panquecas macias e doces, perfeitas para um café da manhã saudável.",
+                fullDescription: "Essas panquecas de banana são ideais para o café da manhã! Você só precisa de bananas maduras, ovos e um pouco de canela. Amasse as bananas, misture com os ovos e a canela, e frite em uma frigideira antiaderente. Uma opção saudável e deliciosa!"
+            },
+            {
+                id: 5,
+                title: "Bolo de Chocolate Simples",
+                description: "Um bolo de chocolate úmido e delicioso, ideal para qualquer ocasião.",
+                fullDescription: "Para esse bolo de chocolate, você vai precisar de farinha, açúcar, cacau em pó, ovos, leite e óleo. Misture os ingredientes, despeje em uma forma untada e leve ao forno por 30-40 minutos. Perfeito para os amantes de chocolate!"
+            },
+            {
+                id: 6,
+                title: "Lasanha de Legumes",
+                description: "Uma versão leve da lasanha, feita com legumes frescos e molho branco.",
+                fullDescription: "Essa lasanha de legumes é deliciosa e saudável. Use berinjela, abobrinha, pimentão e molho branco para as camadas. Cubra com queijo e leve ao forno até dourar. Ideal para uma refeição leve e nutritiva."
+            }
+            // Outras receitas...
+        ];
+
+        // Função para exibir as receitas
+        function displayRecipes() {
+            const recipeList = document.getElementById('recipe-list');
+            recipeList.innerHTML = '';
+
+            recipes.forEach(recipe => {
+                const recipeCard = document.createElement('div');
+                recipeCard.classList.add('recipe-card');
+                
+                recipeCard.innerHTML = `
+                    <h3>${recipe.title}</h3>
+                    <p id="description-${recipe.id}">${recipe.description}</p>
+                    <button class="view-more-button" onclick="toggleDescription(${recipe.id})">Visualizar mais</button>
+                    <button class="favorite-button" onclick="saveFavorite(${recipe.id})">Salvar como Favorita</button>
+                `;
+                
+                recipeList.appendChild(recipeCard);
+            });
+        }
+
+        // Função para expandir ou recolher a descrição
+        function toggleDescription(recipeId) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            const descriptionElement = document.getElementById(`description-${recipeId}`);
+            
+            if (descriptionElement.textContent === recipe.description) {
+                descriptionElement.textContent = recipe.fullDescription;
+            } else {
+                descriptionElement.textContent = recipe.description;
+            }
+        }
+
+        // Função para salvar receita como favorita
+        function saveFavorite(recipeId) {
+            const favoriteRecipe = recipes.find(recipe => recipe.id === recipeId);
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            
+            if (!favorites.some(recipe => recipe.id === recipeId)) {
+                favorites.push(favoriteRecipe);
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                alert(`${favoriteRecipe.title} foi adicionada às suas receitas favoritas!`);
+            } else {
+                alert(`${favoriteRecipe.title} já está nas suas receitas favoritas.`);
+            }
+        }
+
+        // Função para exibir favoritos
+        function displayFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const favoritesList = document.getElementById('favorites-list');
+            favoritesList.innerHTML = '';
+
+            if (favorites.length > 0) {
+                favorites.forEach(favorite => {
+                    const favoriteItem = document.createElement('div');
+                    favoriteItem.innerHTML = `
+                        <h3>${favorite.title}</h3>
+                        <p>${favorite.fullDescription}</p>
+                    `;
+                    favoritesList.appendChild(favoriteItem);
+                });
+            } else {
+                favoritesList.innerHTML = "<p>Você ainda não adicionou favoritos.</p>";
+            }
+
+            document.getElementById('favoritesModal').style.display = 'flex';
+        }
+
+        // Função para fechar o modal de favoritos
+        function closeFavorites() {
+            document.getElementById('favoritesModal').style.display = 'none';
+        }
+
+        // Função para redirecionar à página para logar
+        function goToLoginPage() {
+            window.location.href = 'index.html';
+        }
+
+        // Carregar receitas ao iniciar a página
+        document.addEventListener('DOMContentLoaded', displayRecipes);
+    </script>
+</body>
+
+</html>
