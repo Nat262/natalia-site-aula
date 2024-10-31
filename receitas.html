@@ -160,6 +160,7 @@
                 description: "Uma versão leve da lasanha, feita com legumes frescos e molho branco.",
                 fullDescription: "Essa lasanha de legumes é deliciosa e saudável. Use berinjela, abobrinha, pimentão e molho branco para as camadas. Cubra com queijo e leve ao forno até dourar. Ideal para uma refeição leve e nutritiva."
             }
+          
             // Outras receitas...
         ];
 
@@ -208,7 +209,7 @@
                 alert(`${favoriteRecipe.title} já está nas suas receitas favoritas.`);
             }
         }
-
+        
         // Função para exibir favoritos
         function displayFavorites() {
             const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
@@ -230,7 +231,7 @@
 
             document.getElementById('favoritesModal').style.display = 'flex';
         }
-
+        
         // Função para fechar o modal de favoritos
         function closeFavorites() {
             document.getElementById('favoritesModal').style.display = 'none';
